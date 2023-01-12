@@ -277,6 +277,24 @@ func TestReadDir(t *testing.T) {
 	}
 }
 
+func TestChangewd(t *testing.T) {
+	for _, addr := range ftpdAddrs {
+		c, err := DialConfig(Config{User: "goftp", Password: "rocks"}, addr)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		os.Mkdir("testroot/git-ignored/fooxdir", 0x755)
+
+		err = c.Changewd("testroot/git-ignored/fooxdir")
+		if err != nil {
+			t.Error(err)
+		}
+
+		os.RemoveAll("testroot/git-ignored/fooxdir")
+	}
+}
+
 func TestReadDirNoMLSD(t *testing.T) {
 	// pureFTPD seems to have some issues with timestamps in LIST output
 	for _, addr := range proAddrs {
