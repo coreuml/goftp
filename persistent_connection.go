@@ -228,6 +228,48 @@ func (pconn *persistentConn) hasFeatureWithArg(name, arg string) bool {
 	return found && strings.ToUpper(arg) == val
 }
 
+func (pconn *persistentConn) setClient() error {
+	code, msg, err := pconn.sendCommand("CLNT GoFTP")
+	if err != nil {
+		return err
+	}
+
+	if !positiveCompletionReply(code) {
+		pconn.debug("server doesn't support CLNT: %d-%s", code, msg)
+		return nil
+	}
+
+	return nil
+}
+
+func (pconn *persistentConn) setUnicode() error {
+	code, msg, err := pconn.sendCommand("OPTS UTF8 ON")
+	if err != nil {
+		return err
+	}
+
+	if !positiveCompletionReply(code) {
+		pconn.debug("server doesn't support UTF8: %d-%s", code, msg)
+		return nil
+	}
+
+	return nil
+}
+
+func (pconn *persistentConn) setMLST() error {
+	code, msg, err := pconn.sendCommand("OPTS MLST type;size;modify;perm;unix.mode;")
+	if err != nil {
+		return err
+	}
+
+	if !positiveCompletionReply(code) {
+		pconn.debug("server doesn't support UTF8: %d-%s", code, msg)
+		return nil
+	}
+
+	return nil
+}
+
 func (pconn *persistentConn) logIn() error {
 	if pconn.config.User == "" {
 		return nil
